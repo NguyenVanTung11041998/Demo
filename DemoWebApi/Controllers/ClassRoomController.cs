@@ -22,7 +22,7 @@ namespace DemoWebApi.Controllers
         [Route("all")]
         public async Task<List<ClassRoomDto>> GetAllAsync()
         {
-            return await DbContext.ClassRooms.Where(x => x.Name == "1B").Select(x => new ClassRoomDto { Id = x.Id, Name = x.Name }).ToListAsync();
+            return await DbContext.ClassRooms.Select(x => new ClassRoomDto { Id = x.Id, Name = x.Name }).ToListAsync();
         }
 
         [HttpPost]
@@ -35,6 +35,59 @@ namespace DemoWebApi.Controllers
             };
 
             await DbContext.ClassRooms.AddAsync(classRoom);
+
+            await DbContext.SaveChangesAsync();
+
+            return true;
+        }
+
+        [HttpPut]
+        [Route("update")]
+        public async Task<bool> UpdateAsync(ClassRoomUpdateRequest input)
+        {
+            // nguyên tắc update
+            // B1 get entity từ trong db
+            var classRoom = await DbContext.ClassRooms.FirstOrDefaultAsync(x => x.Id == input.Id);
+
+            // check null
+            if (classRoom == null) return false;
+
+            // update
+            classRoom.Name = input.Name;
+
+            DbContext.ClassRooms.Update(classRoom);
+
+            await DbContext.SaveChangesAsync();
+
+            return true;
+        }
+
+        [HttpGet]
+        [Route("get-by-id")]
+        public async Task<ClassRoomDto> GetByIdAsync(int id)
+        {
+            var classRoom = await DbContext.ClassRooms.Select(x => new ClassRoomDto
+            {
+                Id = x.Id,
+                Name = x.Name
+            }).FirstOrDefaultAsync(x => x.Id == id);
+
+            return classRoom;
+        }
+
+        [HttpDelete]
+        [Route("delete")]
+        public async Task<bool> DeleteAsync(int id)
+        {
+            // nguyên tắc xóa
+            // B1 get entity từ trong db
+            var classRoom = await DbContext.ClassRooms.FirstOrDefaultAsync(x => x.Id == id);
+
+            // check null
+            if (classRoom == null) return false;
+
+            // xóa khỏi db
+            DbContext.ClassRooms.Remove(classRoom);
 
             await DbContext.SaveChangesAsync();
 
