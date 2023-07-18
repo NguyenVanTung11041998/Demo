@@ -9,6 +9,10 @@ namespace DemoWebApi
         {
             var builder = WebApplication.CreateBuilder(args);
 
+            builder.Services.AddControllers();
+
+            builder.Services.AddSwaggerGen();
+
             // Add services to the container.
             builder.Services.AddAuthorization();
 
@@ -22,9 +26,17 @@ namespace DemoWebApi
 
             var app = builder.Build();
 
+            if (app.Environment.IsDevelopment())
+            {
+                app.UseSwagger();
+                app.UseSwaggerUI();
+            }
+
             // Configure the HTTP request pipeline.
 
             app.UseAuthorization();
+
+            app.MapControllers();
 
             app.Run();
         }
