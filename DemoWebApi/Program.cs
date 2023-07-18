@@ -1,3 +1,6 @@
+﻿using DemoWebApi.EFCore;
+using Microsoft.EntityFrameworkCore;
+
 namespace DemoWebApi
 {
     public class Program
@@ -9,30 +12,19 @@ namespace DemoWebApi
             // Add services to the container.
             builder.Services.AddAuthorization();
 
+            // thiết lập kết nối đến CSDL
+
+            // lấy ra chuỗi kết nối từ config appsetting.json
+            string connection = builder.Configuration.GetConnectionString("Default");
+
+            // bát đầu kết nối
+            builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(connection));
 
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
 
             app.UseAuthorization();
-
-            var summaries = new[]
-            {
-            "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-        };
-
-            app.MapGet("/weatherforecast", (HttpContext httpContext) =>
-            {
-                var forecast = Enumerable.Range(1, 5).Select(index =>
-                    new WeatherForecast
-                    {
-                        Date = DateTime.Now.AddDays(index),
-                        TemperatureC = Random.Shared.Next(-20, 55),
-                        Summary = summaries[Random.Shared.Next(summaries.Length)]
-                    })
-                    .ToArray();
-                return forecast;
-            });
 
             app.Run();
         }
