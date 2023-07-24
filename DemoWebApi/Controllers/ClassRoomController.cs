@@ -20,7 +20,7 @@ namespace DemoWebApi.Controllers
 
         [HttpGet]
         [Route("all")]
-        public async Task<List<ClassRoomDto>> GetAllAsync()
+        public async Task<List<ClassRoomDto>> GetAllClassRoomAsync()
         {
             return await DbContext.ClassRooms.Select(x => new ClassRoomDto { Id = x.Id, Name = x.Name }).ToListAsync();
         }
@@ -93,5 +93,6 @@ namespace DemoWebApi.Controllers
 
             return true;
         }
+        
     }
 }
