@@ -8,7 +8,7 @@ namespace DemoWebApi.Entities
         [Required]
         [StringLength(100)]
         public string Name { get; set; } 
-        public string CreatedUserId { get; set; }
+        public int CreatedUserId { get; set; }
         public DateTime? CreatedDateTime { get; set; }
     }
 }

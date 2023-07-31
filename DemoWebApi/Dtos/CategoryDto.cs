@@ -8,8 +8,7 @@ namespace DemoWebApi.Dtos
     {
         public int Id { get; set; }
         public string Name { get; set; }
-        public string CreatedUserId { get; set; }
-        public DateTime CreatedDateTime { get; set; }
-
+        public int CreatedUserId { get; set; }
+        public DateTime? CreatedDateTime { get; set; }
     }
 }

@@ -56,18 +56,9 @@ namespace DemoWebApi.Controllers
             DbContext = context;
             Config = config;
         }
-        [HttpPost]
-        [Route("login")]
-        public async Task<string> LoginAsync(LoginRequest input)
-        {
-            var user = await DbContext.Users.FirstOrDefaultAsync(x => x.UserName == input.Username && x.PassWord == input.Password);
 
-            if (user == null) return null;
-
-            return GenerateJSONWebToken(user);
-        }
         [HttpGet]
-        [Route("GetAllUser")]
+        [Route("GetAllCategory")]
         [Authorize]
         public async Task<List<CategoryDto>> GetAllUserAsync()
         {
@@ -83,17 +74,17 @@ namespace DemoWebApi.Controllers
         [HttpGet]
         [Route("GetCategoryById")]
         [Authorize]
-        public async Task<List<CategoryDto>> GetCategoryById(int id)
+        public async Task<CategoryDto> GetCategoryById(int id)
         {
-            var category = DbContext.Category.Select(x => new CategoryDto
+            var category = await DbContext.Category.Select(x => new CategoryDto
             {
                 Id = x.Id,
                 Name = x.Name,
                 CreatedUserId = x.CreatedUserId,
-                CreatedDateTime = (DateTime)x.CreatedDateTime
-            }).FirstOrDefault(c => c.Id == id);
+                CreatedDateTime = x.CreatedDateTime
+            }).FirstOrDefaultAsync(c => c.Id == id);
            
-            return null;
+            return category;
         }
     }
 }
