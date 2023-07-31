@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.Net.Http.Headers;
 using System.IdentityModel.Tokens.Jwt;
 using System.Net;
 using System.Security.Claims;
@@ -89,6 +90,21 @@ namespace DemoWebApi.Controllers
               signingCredentials: credentials);
 
             return new JwtSecurityTokenHandler().WriteToken(token);
+        }
+
+        public static int GetUserIdOfCurrentUser(HttpContext httpContext)
+        {
+            _ = httpContext.Request.Headers.TryGetValue(HeaderNames.Authorization, out var tokenString);
+
+            var jwtEncodedString = tokenString.ToString()[7..];
+
+            var token = new JwtSecurityToken(jwtEncodedString);
+
+            var claim = token.Claims.FirstOrDefault(x => x.Type == "Id");
+
+            string id = claim.Value;
+
+            return int.Parse(id);
         }
     }
 }
