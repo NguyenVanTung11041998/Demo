@@ -2,9 +2,14 @@
 using DemoWebApi.EFCore;
 using DemoWebApi.Entities;
 using DemoWebApi.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
 using System.Net;
+using System.Security.Claims;
+using System.Text;
 using System.Xml.Linq;
 
 
@@ -16,13 +21,16 @@ namespace DemoWebApi.Controllers
     public class UserController
     {
         private ApplicationDbContext DbContext { get; }
+        private IConfiguration Config { get; }
 
-        public UserController(ApplicationDbContext context)
+        public UserController(ApplicationDbContext context, IConfiguration config)
         {
             DbContext = context;
+            Config = config;
         }
         [HttpGet]
         [Route("all")]
+        [Authorize]
         public async Task<List<UserDto>> GetAllUserAsync()
         {
             return await DbContext.Users
@@ -52,5 +60,35 @@ namespace DemoWebApi.Controllers
             return true;
         }
 
+        [HttpPost]
+        [Route("login")]
+        public async Task<string> LoginAsync(LoginRequest input)
+        {
+            var user = await DbContext.Users.FirstOrDefaultAsync(x => x.UserName == input.Username && x.PassWord == input.Password);
+
+            if (user == null) return null;
+
+            return GenerateJSONWebToken(user);
+        }
+
+        private string GenerateJSONWebToken(User user)
+        {
+            var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Config["Jwt:Key"]));
+            var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
+
+            var claims = new[]
+            {
+                new Claim("Id", user.Id.ToString()),
+                new Claim("UserName", user.UserName)
+            };
+
+            var token = new JwtSecurityToken(Config["Jwt:Issuer"],
+              Config["Jwt:Issuer"],
+              claims,
+              expires: DateTime.Now.AddMinutes(120),
+              signingCredentials: credentials);
+
+            return new JwtSecurityTokenHandler().WriteToken(token);
+        }
     }
 }
