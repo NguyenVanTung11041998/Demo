@@ -10,6 +10,8 @@ namespace DemoWebApi.EFCore
         public DbSet<ClassRoom> ClassRooms { get; set; }
 
         public DbSet<User> Users { get; set; }
+        
+        public DbSet<Category> Category { get; set; }
 
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
         {
