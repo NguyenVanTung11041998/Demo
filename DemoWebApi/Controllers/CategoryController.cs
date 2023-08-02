@@ -1,6 +1,7 @@
 ﻿using DemoWebApi.Dtos;
 using DemoWebApi.EFCore;
 using DemoWebApi.Entities;
+using DemoWebApi.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -57,6 +58,50 @@ namespace DemoWebApi.Controllers
             Config = config;
         }
 
+        [HttpPost]
+        [Route("CreateCategory")]
+        [Authorize]
+        public async Task<bool> CreateCategory(CategoryCreateModel input)
+        {
+            int createdUserId = GetUserIdOfCurrentUser(HttpContext);
+            var categorys = new Category
+            {
+                Name = input.Name,
+                CreatedUserId = createdUserId,
+                CreatedDateTime = DateTime.Now
+            };
+            await DbContext.Category.AddAsync(categorys);
+            await DbContext.SaveChangesAsync();
+            return true;
+        }
+        [HttpPut]
+        [Route("UpdateCategory")]
+        [Authorize]
+        public async Task<bool> UpdateCategory(int categoryId, CategoryUpdateModel input)
+        {
+            var category = await DbContext.Category.FindAsync(categoryId);
+            if (category == null)
+            {
+                return false; 
+            }
+            category.Name = input.Name;
+            await DbContext.SaveChangesAsync();
+            return true; 
+        }
+        [HttpDelete]
+        [Route("DeleteCategory")]
+        [Authorize]
+        public async Task<bool> DeleteCategory(int categoryId)
+        {
+            var category = await DbContext.Category.FindAsync(categoryId);
+            if (category == null)
+            {
+                return false;
+            }
+            DbContext.Category.Remove(category); 
+            await DbContext.SaveChangesAsync();
+            return true; 
+        }
         [HttpGet]
         [Route("GetAllCategory")]
         [Authorize]
