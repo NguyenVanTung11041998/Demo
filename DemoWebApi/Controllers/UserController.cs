@@ -50,8 +50,7 @@ namespace DemoWebApi.Controllers
                 .Select(x => new UserDto
                 {
                     UserName = x.UserName,
-                    UserEmail=x.UserEmail,
-                    Password=x.PassWord
+                    UserEmail=x.UserEmail
                 }).ToListAsync();
         }
 
@@ -83,21 +82,27 @@ namespace DemoWebApi.Controllers
 
             return GenerateJSONWebToken(user);
         }
-        //[HttpGet]
-        //[Route("totalPages")]
-        //public async Task<List<User>> TotalPages(int page , int pageSize)
-        //{
-        //    var totalCount = DbContext.Users.Count();
-        //    var totalPages = (int)Math.Ceiling((double)totalCount / pageSize);
+        [HttpGet]
+        [Route("totalPages")]
+        public async Task<GridUserDto> TotalPages(int page, int pageSize, string keyword)
+        {
+            IQueryable<User> query = DbContext.Users;
 
-        //    var users = DbContext.Users
-        //        .OrderBy(u => u.Id)
-        //        .Skip((page - 1) * pageSize)
-        //        .Take(pageSize)
-        //        .ToList();
+            if (!string.IsNullOrWhiteSpace(keyword))
+                query = query.Where(x => x.UserName.Contains(keyword));
 
-        //    return users;
-        //}
+            int totalCount = await query.CountAsync();
+
+            var list = await query.Skip((page - 1) * pageSize).Take(pageSize)
+                            .Select(x => new UserDto
+                            {
+                                Avatar = x.Avatar,
+                                UserEmail = x.UserEmail,
+                                UserName = x.UserName
+                            }).ToListAsync();
+
+            return new GridUserDto { TotalCount = totalCount, Users = list };
+        }
         [HttpPost]
         [Route("UploadFile")]
         public async Task<string> UploadFile([FromForm] UserAvatarDto input)
