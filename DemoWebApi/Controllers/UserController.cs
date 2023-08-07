@@ -25,6 +25,7 @@ namespace DemoWebApi.Controllers
 
     public class UserController : Controller
     {
+        
         private ApplicationDbContext DbContext { get; }
         private IConfiguration Config { get; }
         private static string[] SupportedTypes { get; } = new[] { "jpg", "jpeg", "png", "gif" };
@@ -35,6 +36,10 @@ namespace DemoWebApi.Controllers
             DbContext = context;
             Config = config;
             L = l;
+            //for(int i = 2; i<=100; i++)
+            //{
+            //    DbContext.Users.Add(new User { Id = i, UserName =" Name "+i, UserEmail= "Email "+i, PassWord = "pass"+i });
+            //}
         }
         [HttpGet]
         [Route("all")]
@@ -78,7 +83,21 @@ namespace DemoWebApi.Controllers
 
             return GenerateJSONWebToken(user);
         }
+        //[HttpGet]
+        //[Route("totalPages")]
+        //public async Task<List<User>> TotalPages(int page , int pageSize)
+        //{
+        //    var totalCount = DbContext.Users.Count();
+        //    var totalPages = (int)Math.Ceiling((double)totalCount / pageSize);
 
+        //    var users = DbContext.Users
+        //        .OrderBy(u => u.Id)
+        //        .Skip((page - 1) * pageSize)
+        //        .Take(pageSize)
+        //        .ToList();
+
+        //    return users;
+        //}
         [HttpPost]
         [Route("UploadFile")]
         public async Task<string> UploadFile([FromForm] UserAvatarDto input)
