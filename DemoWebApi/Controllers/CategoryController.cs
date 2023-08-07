@@ -85,6 +85,7 @@ namespace DemoWebApi.Controllers
                 return false; 
             }
             category.Name = input.Name;
+            DbContext.Category.Update(category);
             await DbContext.SaveChangesAsync();
             return true; 
         }

@@ -4,11 +4,10 @@ using System.ComponentModel.DataAnnotations;
 
 namespace DemoWebApi.Dtos
 {
-    public class UserDto
+    public class UserAvatarDto
     {
-        public string UserName { get; set; }
-        public string UserEmail { get; set; }
-        public string Password { get; set; }
+
+  
         public string Avatar { get; set; }
 
     }

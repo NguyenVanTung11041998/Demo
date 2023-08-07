@@ -12,6 +12,8 @@ using System.Net;
 using System.Security.Claims;
 using System.Text;
 using System.Xml.Linq;
+using System.Threading.Tasks;
+using DemoWebApi.Migrations;
 
 
 namespace DemoWebApi.Controllers
@@ -19,7 +21,7 @@ namespace DemoWebApi.Controllers
     [ApiController]
     [Route("/api/User")]
 
-    public class UserController
+    public class UserController : Controller
     {
         private ApplicationDbContext DbContext { get; }
         private IConfiguration Config { get; }
@@ -71,6 +73,45 @@ namespace DemoWebApi.Controllers
 
             return GenerateJSONWebToken(user);
         }
+        [HttpPost]
+        [Route("UploadFile")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> UploadFile(UserAvatarDto input,IFormFile file, CancellationToken cancellationtoken)
+        {
+            var Users = new User
+            {
+                Avatar = input.Avatar,
+            };
+            await DbContext.Users.AddAsync(Users);
+            await DbContext.SaveChangesAsync();
+            var result = await WriteFile(file);
+            return Ok(result);
+        }
+        private async Task<string> WriteFile(IFormFile file)
+        {
+            string filename = "";
+            try
+            {
+                var extension = "." + file.FileName.Split('.')[file.FileName.Split('.').Length - 1];
+                filename = DateTime.Now.Ticks.ToString() + extension;
+                var filepath = Path.Combine(Directory.GetCurrentDirectory(), "UpLoad\\Files");
+                if (!Directory.Exists(filepath))
+                {
+                    Directory.CreateDirectory(filepath);
+                }
+                var exactpath = Path.Combine(Directory.GetCurrentDirectory(), "Upload\\Files", filename);
+                using (var stream = new FileStream(exactpath, FileMode.Create))
+                {
+                    await file.CopyToAsync(stream);
+                }
+            }
+            catch (Exception ex)
+            {
+
+            }
+            return filename;
+        }
 
         private string GenerateJSONWebToken(User user)
         {
@@ -106,5 +147,7 @@ namespace DemoWebApi.Controllers
 
             return int.Parse(id);
         }
+
+
     }
 }

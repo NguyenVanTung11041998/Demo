@@ -9,6 +9,6 @@ namespace DemoWebApi.Models
         public string UserEmail { get; set; }
         [Required]
         public string PassWord { get; set; }
-       
+        public string? Avatar { get; set; }
     }
 }
