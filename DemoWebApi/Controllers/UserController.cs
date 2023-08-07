@@ -73,21 +73,39 @@ namespace DemoWebApi.Controllers
 
             return GenerateJSONWebToken(user);
         }
+
         [HttpPost]
         [Route("UploadFile")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> UploadFile(UserAvatarDto input,IFormFile file, CancellationToken cancellationtoken)
+        public async Task<IActionResult> UploadFile(IFormFile file, CancellationToken cancellationtoken)
         {
-            var Users = new User
+            if (file == null || file.Length <= 0)
             {
-                Avatar = input.Avatar,
+                return BadRequest("No file uploaded.");
+            }
+
+            var filename = await WriteFile(file);
+
+            var input = new UserAvatarDto
+            {
+                Avatar = filename
             };
-            await DbContext.Users.AddAsync(Users);
-            await DbContext.SaveChangesAsync();
+
             var result = await WriteFile(file);
             return Ok(result);
         }
+
+        //private async Task<bool> SaveFile(IFormFile file, UserAvatarDto input)
+        //{
+        //    var Users = new User
+        //    {
+        //        Avatar = input.Avatar 
+        //    };
+        //    await DbContext.Users.SavePostImageAsync(Users);
+        //    await DbContext.SaveChangesAsync();
+        //    return true;
+        //}
         private async Task<string> WriteFile(IFormFile file)
         {
             string filename = "";
