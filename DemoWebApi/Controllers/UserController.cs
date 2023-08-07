@@ -14,7 +14,9 @@ using System.Text;
 using System.Xml.Linq;
 using System.Threading.Tasks;
 using DemoWebApi.Migrations;
-
+using DemoWebApi.Helpers;
+using DemoWebApi.ExceptionHandling;
+using Microsoft.Extensions.Localization;
 
 namespace DemoWebApi.Controllers
 {
@@ -25,11 +27,14 @@ namespace DemoWebApi.Controllers
     {
         private ApplicationDbContext DbContext { get; }
         private IConfiguration Config { get; }
+        private static string[] SupportedTypes { get; } = new[] { "jpg", "jpeg", "png", "gif" };
+        protected IStringLocalizer<UserController> L { get; }
 
-        public UserController(ApplicationDbContext context, IConfiguration config)
+        public UserController(ApplicationDbContext context, IConfiguration config, IStringLocalizer<UserController> l)
         {
             DbContext = context;
             Config = config;
+            L = l;
         }
         [HttpGet]
         [Route("all")]
@@ -73,44 +78,34 @@ namespace DemoWebApi.Controllers
 
             return GenerateJSONWebToken(user);
         }
+
         [HttpPost]
         [Route("UploadFile")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> UploadFile(UserAvatarDto input,IFormFile file, CancellationToken cancellationtoken)
+        public async Task<string> UploadFile([FromForm] UserAvatarDto input)
         {
-            var Users = new User
-            {
-                Avatar = input.Avatar,
-            };
-            await DbContext.Users.AddAsync(Users);
-            await DbContext.SaveChangesAsync();
-            var result = await WriteFile(file);
-            return Ok(result);
-        }
-        private async Task<string> WriteFile(IFormFile file)
-        {
-            string filename = "";
-            try
-            {
-                var extension = "." + file.FileName.Split('.')[file.FileName.Split('.').Length - 1];
-                filename = DateTime.Now.Ticks.ToString() + extension;
-                var filepath = Path.Combine(Directory.GetCurrentDirectory(), "UpLoad\\Files");
-                if (!Directory.Exists(filepath))
-                {
-                    Directory.CreateDirectory(filepath);
-                }
-                var exactpath = Path.Combine(Directory.GetCurrentDirectory(), "Upload\\Files", filename);
-                using (var stream = new FileStream(exactpath, FileMode.Create))
-                {
-                    await file.CopyToAsync(stream);
-                }
-            }
-            catch (Exception ex)
-            {
+            var userId = GetUserIdOfCurrentUser(HttpContext);
 
+            var user = await DbContext.Users.FirstOrDefaultAsync(x => x.Id == userId);
+
+            if (user == null) throw new UserFriendlyException("NoData");
+
+            if (input.File != null)
+            {
+                string fileLocation = UploadFileHelper.CreateFolderIfNotExists("wwwroot", "Images");
+
+                var fileExt = Path.GetExtension(input.File.FileName)[1..].ToLower();
+
+                if (!SupportedTypes.Contains(fileExt))
+                    throw new UserFriendlyException(L["InvalidFile"]);
+
+                string fileName = await UploadFileHelper.UploadAsync(fileLocation, input.File);
+
+                user.Avatar = $"/Images/{fileName}";
+
+                DbContext.Users.Update(user);
             }
-            return filename;
+
+            return user.Avatar;
         }
 
         private string GenerateJSONWebToken(User user)
@@ -147,7 +142,5 @@ namespace DemoWebApi.Controllers
 
             return int.Parse(id);
         }
-
-
     }
 }

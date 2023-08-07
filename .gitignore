@@ -8,3 +8,5 @@
 /DemoWebApi/bin/
 *.suo
 *.user
+*.txt
+/DemoWebApi/wwwroot/Images/

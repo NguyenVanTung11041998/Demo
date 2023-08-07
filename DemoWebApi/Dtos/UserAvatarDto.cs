@@ -1,14 +1,8 @@
-﻿using DemoWebApi.Entities;
-using System.ComponentModel.DataAnnotations.Schema;
-using System.ComponentModel.DataAnnotations;
-
-namespace DemoWebApi.Dtos
+﻿namespace DemoWebApi.Dtos
 {
     public class UserAvatarDto
     {
-
-  
+        public IFormFile File { get; set; }
         public string Avatar { get; set; }
-
     }
 }
