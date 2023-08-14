@@ -1,4 +1,5 @@
-﻿using Microsoft.Net.Http.Headers;
+﻿using DemoWebApi.Consts;
+using Microsoft.Net.Http.Headers;
 using System.IdentityModel.Tokens.Jwt;
 using System.Net;
 
@@ -46,19 +47,19 @@ namespace DemoWebApi.Extensions
             return null;
         }
 
-        //public static string GetUserCodeOfUserLogin(this IHttpContextAccessor httpContextAccessor)
-        //{
-        //    _ = httpContextAccessor.HttpContext.Request.Headers.TryGetValue(HeaderNames.Authorization, out var tokenString);
+        public static int GetUserIdOfUserLogin(this IHttpContextAccessor httpContextAccessor)
+        {
+            _ = httpContextAccessor.HttpContext.Request.Headers.TryGetValue(HeaderNames.Authorization, out var tokenString);
 
-        //    var jwtEncodedString = tokenString.ToString()[7..];
+            var jwtEncodedString = tokenString.ToString()[7..];
 
-        //    var token = new JwtSecurityToken(jwtEncodedString);
+            var token = new JwtSecurityToken(jwtEncodedString);
 
-        //    var claim = token.Claims.FirstOrDefault(x => x.Type == ClaimTypeConst.UserCode);
+            var claim = token.Claims.FirstOrDefault(x => x.Type == ClaimType.UserId);
 
-        //    string userCode = claim.Value;
+            string id = claim.Value;
 
-        //    return userCode;
-        //}
+            return int.Parse(id);
+        }
     }
 }

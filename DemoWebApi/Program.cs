@@ -1,10 +1,8 @@
 ﻿using DemoWebApi.EFCore;
-using DemoWebApi.Localizers;
 using DemoWebApi.Middlewares;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Localization;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.Net.Http.Headers;
 using Microsoft.OpenApi.Models;
@@ -96,9 +94,7 @@ namespace DemoWebApi
 
                 builder.Services.AddDistributedMemoryCache();
 
-                builder.Services.AddSingleton<IStringLocalizerFactory, JsonStringLocalizerFactory>();
-
-                builder.Services.AddSingleton<LocalizationMiddleware>();
+                builder.Services.RegisterServices();
 
                 builder.Services.AddMvc();
 
