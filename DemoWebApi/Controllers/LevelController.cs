@@ -1,6 +1,7 @@
 ﻿using DemoWebApi.Dtos.Levels;
 using DemoWebApi.EFCore;
 using DemoWebApi.Entities;
+using DemoWebApi.Repositories.Levels;
 using DemoWebApi.Services.Levels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -27,54 +28,39 @@ namespace DemoWebApi.Controllers
         }
         [HttpPut]
         [Route("update")]
-        public async Task<bool> UpdateLevel(int id, UpdateLevelDto input)
+        public async Task<bool> UpdateLevel(UpdateLevelDto input)
         {
-            var level = await DbContext.Levels.FindAsync(id);
-            if (level == null)
-            {
-                return false;
-            }
-            level.Name = input.name;
-            DbContext.Levels.Update(level);
-            await DbContext.SaveChangesAsync();
+            await LevelAppService.UpdateLevel(input, true);
             return true;
         }
         [HttpDelete]
         [Route("delete")]
         public async Task<bool> DeleteLevel(int id)
         {
-            var level = await DbContext.Levels.FindAsync(id);
-            if (level == null)
-            {
-                return false;
-            }
-            DbContext.Levels.Remove(level);
-            await DbContext.SaveChangesAsync();
+            await LevelAppService.DeleteLevel(id);
             return true;
         }
         [HttpGet]
         [Route("GetAllCategory")]
-        [Authorize]
         public async Task<List<LevelDto>> GetAllLevelAsync()
         {
             var level = await DbContext.Levels
-                .Select(x => new Level
+                .Select(x => new LevelDto
                 {
-                    Id = x.Id,
-                    Name = x.Name,
+                    id = x.Id,
+                    name = x.Name,
                 }).ToListAsync();
             return level;
         }
         [HttpGet]
         [Route("GetCategoryById")]
-        [Authorize]
         public async Task<LevelDto> GetLevelById(int id)
         {
-            var level = await DbContext.Levels.Select(x => new Level
+            var level = await DbContext.Levels.Select(x => new LevelDto
             {
-                Id = x.Id,
-                Name = x.Name,
-            }).FirstOrDefaultAsync(c => c.Id == id);
+                id = x.Id,
+                name = x.Name,
+            }).FirstOrDefaultAsync(c => c.id == id);
 
             return level;
         }
