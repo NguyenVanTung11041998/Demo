@@ -1,18 +1,13 @@
 ﻿using DemoWebApi.Dtos.Levels;
-using DemoWebApi.EFCore;
-using DemoWebApi.Entities;
-using DemoWebApi.Repositories.Levels;
+using DemoWebApi.Helpers;
 using DemoWebApi.Services.Levels;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace DemoWebApi.Controllers
 {
     [Route("/api/level")]
     public class LevelController : AppBaseController, ILevelAppService
     {
-        private ApplicationDbContext DbContext { get; }
         private ILevelAppService LevelAppService { get; }
 
         public LevelController(ILevelAppService levelAppService)
@@ -28,41 +23,37 @@ namespace DemoWebApi.Controllers
         }
         [HttpPut]
         [Route("update")]
-        public async Task<bool> UpdateLevel(UpdateLevelDto input)
+        public async Task UpdateLevelAsync(UpdateLevelDto input)
         {
-            await LevelAppService.UpdateLevel(input, true);
-            return true;
+            await LevelAppService.UpdateLevelAsync(input);
         }
+
         [HttpDelete]
         [Route("delete")]
-        public async Task<bool> DeleteLevel(int id)
+        public async Task DeleteLevelAsync(int id)
         {
-            await LevelAppService.DeleteLevel(id);
-            return true;
+            await LevelAppService.DeleteLevelAsync(id);
         }
+
         [HttpGet]
-        [Route("GetAllCategory")]
+        [Route("all")]
         public async Task<List<LevelDto>> GetAllLevelAsync()
         {
-            var level = await DbContext.Levels
-                .Select(x => new LevelDto
-                {
-                    id = x.Id,
-                    name = x.Name,
-                }).ToListAsync();
-            return level;
+            return await LevelAppService.GetAllLevelAsync();
         }
-        [HttpGet]
-        [Route("GetCategoryById")]
-        public async Task<LevelDto> GetLevelById(int id)
-        {
-            var level = await DbContext.Levels.Select(x => new LevelDto
-            {
-                id = x.Id,
-                name = x.Name,
-            }).FirstOrDefaultAsync(c => c.id == id);
 
-            return level;
+        [HttpGet]
+        [Route("get-by-id")]
+        public async Task<LevelDto> GetLevelByIdAsync(int id)
+        {
+            return await LevelAppService.GetLevelByIdAsync(id);
+        }
+
+        [HttpGet]
+        [Route("paging")]
+        public async Task<GridResult<LevelDto>> GetAllPagingAsync(int page, int pageSize, string keyword)
+        {
+            return await LevelAppService.GetAllPagingAsync(page, pageSize, keyword);
         }
     }
 }

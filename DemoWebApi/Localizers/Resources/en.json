@@ -1,5 +1,6 @@
 {
   "NoData": "No data",
   "InternalServerError": "Internal Server Error",
-  "Success": "Sucess"
+  "Success": "Sucess",
+  "DataNotFound": "Data Not Found"
 }

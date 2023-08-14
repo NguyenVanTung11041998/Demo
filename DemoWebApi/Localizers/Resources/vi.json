@@ -1,6 +1,7 @@
 {
   "NoData": "Không có dữ liệu",
   "InternalServerError": "Lỗi máy chủ",
-  "Success": "Thành công"
+  "Success": "Thành công",
+  "DataNotFound": "Không tồn tại dữ liệu"
 }
   

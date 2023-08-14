@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using DemoWebApi.Dtos.Levels;
 using DemoWebApi.Dtos.Users;
 using DemoWebApi.Entities;
 
@@ -9,6 +10,8 @@ namespace DemoWebApi
         public MappingProfile()
         {
             CreateMap<User, UserDto>();
+
+            CreateMap<Level, LevelDto>();
         }
     }
 }

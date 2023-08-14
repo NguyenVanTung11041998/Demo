@@ -1,6 +1,12 @@
-﻿using DemoWebApi.ExceptionHandling;
+﻿using DemoWebApi.Consts;
+using DemoWebApi.Dtos;
+using DemoWebApi.ExceptionHandling;
+using DemoWebApi.Extensions;
+using Microsoft.AspNetCore.Http.Features;
 using Microsoft.Extensions.Localization;
+using Newtonsoft.Json;
 using Serilog;
+using System.Net;
 
 namespace DemoWebApi.Middlewares
 {
@@ -22,31 +28,102 @@ namespace DemoWebApi.Middlewares
             try
             {
                 await Next(context);
+
+                context.Response.Body.Seek(0, SeekOrigin.Begin);
+
+                string text = await new StreamReader(context.Response.Body).ReadToEndAsync();
+
+                bool isValidJson = text.IsValidJson();
+
+                var obj = isValidJson ? JsonConvert.DeserializeObject(text) : text;
+
+                bool isSuccess = context.Response.StatusCode >= (int)HttpStatusCode.OK && context.Response.StatusCode < (int)HttpStatusCode.MultipleChoices;
+
+                int statusCode = isSuccess ? (int)HttpStatusCode.OK : context.Response.StatusCode;
+
+                var res = new BaseReponse
+                {
+                    ResponseText = isSuccess ? L["Success"] : L["InternalServerError"],
+                    ResponseCode = statusCode,
+                    Data = obj
+                }.ToString();
+
+                context.Response.Clear();
+
+                context.Response.ContentType = MimeTypeNames.ApplicationJson;
+
+                context.Response.StatusCode = statusCode;
+
+                await context.Response.WriteAsync(res);
             }
             catch (UserFriendlyException ex)
             {
-                HandleException(context, ex);
+                await HandleExceptionAsync(context, ex);
             }
             catch (Exception exceptionObj)
             {
-                HandleException(context, exceptionObj);
+                await HandleExceptionAsync(context, exceptionObj);
             }
         }
-
-        private void HandleException(HttpContext context, UserFriendlyException exception)
+        private async Task HandleExceptionAsync(HttpContext context, UserFriendlyException exception)
         {
             Log.Error($"\n\n{exception.Message}\n{exception.StackTrace}\n");
 
-            context.Response.StatusCode = 500;
+            string result;
+
+            context.Response.ContentType = MimeTypeNames.ApplicationJson;
+
+            if (exception is not null)
+            {
+                bool isValidJson = exception.Details.IsValidJson();
+
+                var obj = isValidJson ? JsonConvert.DeserializeObject(exception.Details) : exception.Details;
+
+                result = new BaseReponse
+                {
+                    ResponseText = exception.Message,
+                    ResponseCode = (int)HttpStatusCode.Forbidden,
+                    Data = obj
+                }.ToString();
+
+                context.Response.StatusCode = (int)HttpStatusCode.Forbidden;
+            }
+            else
+            {
+                result = new BaseReponse
+                {
+                    ResponseText = L["InternalServerError"],
+                    ResponseCode = (int)HttpStatusCode.InternalServerError,
+                }.ToString();
+
+                context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
+            }
+
+            await context.Response.WriteAsync(result);
         }
 
-        private void HandleException(HttpContext context, Exception exception)
+        private async Task HandleExceptionAsync(HttpContext context, Exception exception)
         {
             Log.Error($"\n\n{exception.Message}\n\n");
 
             Log.Error(exception.StackTrace);
 
-            context.Response.StatusCode = 500;
+            context.Response.ContentType = "application/json";
+
+            string result = new BaseReponse
+            {
+                ResponseText = L["InternalServerError"],
+                ResponseCode = (int)HttpStatusCode.InternalServerError,
+                Data = new
+                {
+                    exception.StackTrace,
+                    exception.Message
+                }
+            }.ToString();
+
+            context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
+
+            await context.Response.WriteAsync(result);
         }
     }
 }
