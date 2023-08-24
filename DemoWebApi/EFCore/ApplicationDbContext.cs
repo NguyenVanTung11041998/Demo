@@ -8,7 +8,7 @@ namespace DemoWebApi.EFCore
         public DbSet<User> Users { get; set; }
         public DbSet<Post> Posts { get; set; }
         public DbSet<Asset> Assets { get; set; }
-        public DbSet<Hashtag> Hashtags { get; set; }
+        public DbSet<HashTag> Hashtags { get; set; }
         public DbSet<CompanyPostHashtag> CompanyPostHashtags { get; set; }
         public DbSet<Level> Levels { get; set; }
         public DbSet<CV> CVs { get; set; }
