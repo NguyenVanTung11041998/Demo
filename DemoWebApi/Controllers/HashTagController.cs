@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace DemoWebApi.Controllers
 {
-    [Route("/api/level")]
+    [Route("/api/HasTag")]
     public class HashTagController : AppBaseController, IHashTagService
     {
         private IHashTagService HashTagService { get; }
@@ -19,31 +19,32 @@ namespace DemoWebApi.Controllers
         [Route("add")]
         public async Task AddAsync(CreateHashTagDto input)
         {
-            await HashTagService.AddAsync(input);
+             await HashTagService.AddAsync(input);
         }
         [HttpPut]
         [Route("update")]
-        public async Task UpdateLevelAsync(UpdateHashTagDto input)
+        public async Task UpdateHashTagAsync(UpdateHashTagDto input)
         {
-            await HashTagService.UpdateLevelAsync(input);
+             await HashTagService.UpdateHashTagAsync(input);
         }
+        
         [HttpDelete]
         [Route("delete")]
-        public async Task DeleteLevelAsync(int id)
+        public async Task DeleteHashTagAsync(int id)
         {
-            await HashTagService.DeleteLevelAsync(id);
+             await HashTagService.DeleteHashTagAsync(id);
         }
         [HttpGet]
         [Route("all")]
-        public async Task<List<HashTagDto>>GetAllLevelAsync()
+        public async Task<List<HashTagDto>> GetAllHashTagAsync()
         {
-            return await HashTagService.GetAllLevelAsync();
+            return await HashTagService.GetAllHashTagAsync();
         }
         [HttpGet]
         [Route("get-by-id")]
-        public async Task<HashTagDto> GetLevelByIdAsync(int id)
+        public async Task<HashTagDto> GetHashTagByIdAsync(int id)
         {
-            return await HashTagService.GetLevelByIdAsync(id);
+            return  await HashTagService.GetHashTagByIdAsync(id);
         }
         [HttpGet]
         [Route("paging")]
@@ -51,7 +52,5 @@ namespace DemoWebApi.Controllers
         {
             return await HashTagService.GetAllPagingAsync(page, pageSize, keyword);
         }
-
-        
     }
 }

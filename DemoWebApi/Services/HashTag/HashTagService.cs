@@ -28,7 +28,7 @@ namespace DemoWebApi.Services.HashTag
             };
             await HashTagRepository.AddAsync(hashTag, true);
         }
-        public async Task UpdateLevelAsync(UpdateHashTagDto input)
+        public async Task UpdateHashTagAsync(UpdateHashTagDto input)
         {
             var hashTag = await HashTagRepository.FirstOrDefaultAsync(x => x.Id == input.Id);
 
@@ -41,7 +41,7 @@ namespace DemoWebApi.Services.HashTag
             await HashTagRepository.UpdateAsync(hashTag, true);
         }
 
-        public async Task DeleteLevelAsync(int id)
+        public async Task DeleteHashTagAsync(int id)
         {
             var hashTag = await HashTagRepository.FirstOrDefaultAsync(x => x.Id == id);
 
@@ -50,18 +50,18 @@ namespace DemoWebApi.Services.HashTag
             await HashTagRepository.DeleteAsync(hashTag, true);
         }
 
-        public async Task<List<HashTagDto>> GetAllLevelAsync()
+        public async Task<List<HashTagDto>> GetAllHashTagAsync()
         {
             var hashTags = await HashTagRepository.GetAllAsync();
 
             return Mapper.Map<List<HashTagDto>>(hashTags);
         }
 
-        public async Task<HashTagDto> GetLevelByIdAsync(int id)
+        public async Task<HashTagDto> GetHashTagByIdAsync(int id)
         {
-            var level = await HashTagRepository.FirstOrDefaultAsync(x => x.Id == id);
+            var hashTags = await HashTagRepository.FirstOrDefaultAsync(x => x.Id == id);
 
-            return Mapper.Map<HashTagDto>(level);
+            return Mapper.Map<HashTagDto>(hashTags);
         }
 
         public async Task<GridResult<HashTagDto>> GetAllPagingAsync(int page, int pageSize, string keyword)
