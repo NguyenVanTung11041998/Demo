@@ -1,14 +1,11 @@
 ﻿using AutoMapper;
 using DemoWebApi.Dtos.BrandJob;
-using DemoWebApi.Dtos.HashTag;
 using DemoWebApi.Entities;
 using DemoWebApi.ExceptionHandling;
 using DemoWebApi.Extensions;
 using DemoWebApi.Helpers;
 using DemoWebApi.Repositories.BrachJob;
-using DemoWebApi.Repositories.Hashtag;
 using DemoWebApi.Repositories.Users;
-using DemoWebApi.Services.HashTag;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Localization;
 
@@ -53,16 +50,16 @@ namespace DemoWebApi.Services.BrachJob
 
         public async Task<List<BrachJobDto>> GetAllBrachJobAsync()
         {
-            var brachJob = await BrachJobRepository.GetAllAsync();
+            var branchJobs = await BrachJobRepository.GetAllAsync();
 
-            return Mapper.Map<List<BrachJobDto>>(brachJob);
+            return Mapper.Map<List<BrachJobDto>>(branchJobs);
         }
 
         public async Task<BrachJobDto> GetBrachJobByIdAsync(int id)
         {
-            var brachJob = await BrachJobRepository.FirstOrDefaultAsync(x => x.Id == id);
+            var branchJob = await BrachJobRepository.FirstOrDefaultAsync(x => x.Id == id);
 
-            return Mapper.Map<BrachJobDto>(brachJob);
+            return Mapper.Map<BrachJobDto>(branchJob);
         }
 
         public async Task<GridResult<BrachJobDto>> GetAllPagingAsync(int page, int pageSize, string keyword)

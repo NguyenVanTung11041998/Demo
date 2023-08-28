@@ -25,7 +25,7 @@ namespace DemoWebApi
             };
 
             services.RegisterAssemblyPublicNonGenericClasses(assembliesToScans)
-            .Where(x => x.Name.EndsWith("Repository") || x.Name.EndsWith("AppService"))
+            .Where(x => x.Name.EndsWith("Repository") || x.Name.EndsWith("Service"))
               .AsPublicImplementedInterfaces(ServiceLifetime.Scoped);
 
             var mapperConfig = new MapperConfiguration(mc =>

@@ -1,12 +1,11 @@
 ﻿using DemoWebApi.EFCore;
 using DemoWebApi.Entities;
-using DemoWebApi.Repositories.Hashtag;
 
 namespace DemoWebApi.Repositories.BrachJob
 {
-    public class BrachJobRepositpry : Repository<BranchJob>, IBrachJobRepository
+    public class BrachJobRepository : Repository<BranchJob>, IBrachJobRepository
     {
-        public BrachJobRepositpry(ApplicationDbContext dbContext) : base(dbContext)
+        public BrachJobRepository(ApplicationDbContext dbContext) : base(dbContext)
         {
         }
     }
