@@ -2,6 +2,7 @@
   "NoData": "Không có dữ liệu",
   "InternalServerError": "Lỗi máy chủ",
   "Success": "Thành công",
-  "DataNotFound": "Không tồn tại dữ liệu"
+  "DataNotFound": "Không tồn tại dữ liệu",
+  "DataAlreadyExists": "Tên {0} đã tồn tại"
 }
   

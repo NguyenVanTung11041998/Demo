@@ -9,6 +9,8 @@ using DemoWebApi.Repositories.Users;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Localization;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
+using static Microsoft.Extensions.Logging.EventSource.LoggingEventSource;
 
 namespace DemoWebApi.Services.Nationality
 {
@@ -27,7 +29,7 @@ namespace DemoWebApi.Services.Nationality
             {
                 Name = input.Name,
             };
-            if (input.Path != null)
+            if (input.File != null)
             {
                 string root = "wwwroot";
 
@@ -38,12 +40,17 @@ namespace DemoWebApi.Services.Nationality
                 string fileName = await UploadFileHelper.UploadAsync($"{root}/{imageFolder}", input.File);
 
                 input.Path = $"{imageFolder}/{fileName}";
+                
+                nationality.Path = input.Path ;
             }
+            var check = await NationalityRepository.AnyAsync(x => x.Name == input.Name);
 
-            if (nationality != null) throw new UserFriendlyException(L["DataNotFound"]);
+            if (check == true ) throw new UserFriendlyException(L["DataAlreadyExists",input.Name]);
 
             await NationalityRepository.AddAsync(nationality, true);
+
             string domain = Configuration["Domain"];
+
             return input.Path.StartsWith("http") ? input.Path : $"{domain}/{input.Path}";
 
         }
@@ -55,7 +62,7 @@ namespace DemoWebApi.Services.Nationality
             if (nationality == null) throw new UserFriendlyException(L["DataNotFound"]);
 
             nationality.Name = input.Name;
-            if (input.Path != null)
+            if (input.File != null)
             {
                 string root = "wwwroot";
 
@@ -66,19 +73,22 @@ namespace DemoWebApi.Services.Nationality
                 string fileName = await UploadFileHelper.UploadAsync($"{root}/{imageFolder}", input.File);
 
                 input.Path = $"{imageFolder}/{fileName}";
+
+                nationality.Path = input.Path;
             }
             else if (input.Path.HasValue())
             {
                 input.Path = input.Path;
             }
 
-            if (nationality != null) throw new UserFriendlyException(L["DataNotFound"]);
+            var check = await NationalityRepository.AnyAsync(x => x.Name == input.Name && x.Id != input.Id);
 
-
-
+            if (check == true ) throw new UserFriendlyException(L["DataAlreadyExists"]);
 
             await NationalityRepository.UpdateAsync(nationality, true);
+
             string domain = Configuration["Domain"];
+
             return input.Path.StartsWith("http") ? input.Path : $"{domain}/{input.Path}";
         }
 
@@ -115,37 +125,6 @@ namespace DemoWebApi.Services.Nationality
             var items = Mapper.Map<List<NationalityDto>>(data);
 
             return new GridResult<NationalityDto>(totalCount, items);
-        }
-        public async Task<string> UpdatePathAsync(NationalityUpdatePathRequest input)
-        {
-            var nationalityId = 1;
-
-            var nationality = await NationalityRepository.FirstOrDefaultAsync(x => x.Id == nationalityId);
-
-            if (nationality == null) throw new UserFriendlyException(L["DataNotFound"]);
-
-            if (input.File != null)
-            {
-                string root = "wwwroot";
-
-                string imageFolder = "Images";
-
-                UploadFileHelper.CreateFolderIfNotExists(root, imageFolder);
-
-                string fileName = await UploadFileHelper.UploadAsync($"{root}/{imageFolder}", input.File);
-
-                nationality.Path = $"{imageFolder}/{fileName}";
-            }
-            else if (input.Path.HasValue())
-            {
-                nationality.Path = input.Path;
-            }
-
-            await NationalityRepository.UpdateAsync(nationality, true);
-
-            string domain = Configuration["Domain"];
-
-            return nationality.Path.StartsWith("http") ? nationality.Path : $"{domain}/{nationality.Path}";
         }
     }
 }

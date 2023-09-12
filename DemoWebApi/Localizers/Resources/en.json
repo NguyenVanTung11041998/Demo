@@ -2,5 +2,7 @@
   "NoData": "No data",
   "InternalServerError": "Internal Server Error",
   "Success": "Sucess",
-  "DataNotFound": "Data Not Found"
+  "DataNotFound": "Data Not Found",
+  "DataAlreadyExists":  "Data Already Exit"
+
 }

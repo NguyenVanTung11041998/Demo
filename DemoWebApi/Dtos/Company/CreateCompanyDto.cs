@@ -1,12 +1,11 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using DemoWebApi.Entities;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.ComponentModel.DataAnnotations;
 
-namespace DemoWebApi.Entities
+namespace DemoWebApi.Dtos.Company
 {
-    public class Company : IEntity<int>
+    public class CreateCompanyDto
     {
-        public int Id { get; set; }
-        [Required]
         public string Name { get; set; }
         public string Description { get; set; }
         public string Phone { get; set; }
@@ -21,18 +20,7 @@ namespace DemoWebApi.Entities
         public bool IsHot { get; set; }
         public DateTime? LastUpdateIsHotTime { get; set; }
         public string CompanyUrl { get; set; }
-        [ForeignKey(nameof(Nationality))]
         public int NationalityId { get; set; }
-        public virtual Nationality Nationality { get; set; }
-        [ForeignKey(nameof(User))]
         public int UserId { get; set; }
-
-
-
-        public virtual User User { get; set; }
-        public virtual ICollection<Post> Posts { get; set; }
-        public virtual ICollection<Asset> Assets { get; set; }
-        public virtual ICollection<CompanyPostHashtag> CompanyPostHashtags { get; set; }
-        public virtual ICollection<BranchJobCompany> BranchJobCompanies { get; set; }
     }
 }
