@@ -1,10 +1,15 @@
 ﻿using AutoMapper;
 using DemoWebApi.Dtos.Company;
+using DemoWebApi.Dtos.Levels;
 using DemoWebApi.Entities;
 using DemoWebApi.ExceptionHandling;
+using DemoWebApi.Extensions;
+using DemoWebApi.Helpers;
 using DemoWebApi.Repositories.Companies;
+using DemoWebApi.Repositories.Levels;
 using DemoWebApi.Repositories.Nationality;
 using DemoWebApi.Repositories.Users;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Localization;
 using System.Numerics;
 using System.Xml.Linq;
@@ -75,5 +80,33 @@ namespace DemoWebApi.Services.Companies
             if (company == null) throw new UserFriendlyException(L["DataNotFound"]);
             await CompanyRepository.DeleteAsync(company , true);
         }
+        public async Task<List<CompanyDto>> GetAllCompanyAsync()
+        {
+            var levels = await CompanyRepository.GetAllAsync();
+
+            return Mapper.Map<List<CompanyDto>>(levels);
+        }
+
+        public async Task<CompanyDto> GetCompanyByIdAsync(int id)
+        {
+            var level = await CompanyRepository.FirstOrDefaultAsync(x => x.Id == id);
+
+            return Mapper.Map<CompanyDto>(level);
+        }
+
+        public async Task<GridResult<CompanyDto>> GetAllPagingAsync(int page, int pageSize, string keyword)
+        {
+            var query = CompanyRepository.WhereIf(keyword.HasValue(), x => x.Name.Contains(keyword));
+
+            int totalCount = await query.CountAsync();
+
+            var data = await query.Skip((page - 1) * pageSize).Take(pageSize).ToListAsync();
+
+            var items = Mapper.Map<List<CompanyDto>>(data);
+
+            return new GridResult<CompanyDto>(totalCount, items);
+        }
+
+       
     }
 }

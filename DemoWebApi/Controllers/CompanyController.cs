@@ -1,4 +1,5 @@
 ﻿using DemoWebApi.Dtos.Company;
+using DemoWebApi.Helpers;
 using DemoWebApi.Services.Companies;
 using Microsoft.AspNetCore.Mvc;
 
@@ -29,6 +30,24 @@ namespace DemoWebApi.Controllers
         public async Task DeleteCompapnyAsync(int id)
         {
            await companyAppService.DeleteCompapnyAsync(id);
+        }
+        [HttpGet]
+        [Route("all")]
+        public async Task<List<CompanyDto>> GetAllCompanyAsync()
+        {
+            return await companyAppService.GetAllCompanyAsync();
+        }
+        [HttpGet]
+        [Route("get-by-id")]
+        public async Task<CompanyDto> GetCompanyByIdAsync(int id)
+        {
+            return await companyAppService.GetCompanyByIdAsync(id);
+        }
+        [HttpGet]
+        [Route("paging")]
+        public async Task<GridResult<CompanyDto>> GetAllPagingAsync(int page, int pageSize, string keyword)
+        {
+            return await companyAppService.GetAllPagingAsync(page, pageSize, keyword);
         }
     }
 }

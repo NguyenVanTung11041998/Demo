@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using DemoWebApi.Dtos.Company;
 using DemoWebApi.Dtos.Levels;
 using DemoWebApi.Dtos.Nationality;
 using DemoWebApi.Dtos.Users;
@@ -15,6 +16,8 @@ namespace DemoWebApi
             CreateMap<Level, LevelDto>();
 
             CreateMap<Nationality, NationalityDto>();
+
+            CreateMap<Company, CompanyDto>();
         }
     }
 }
