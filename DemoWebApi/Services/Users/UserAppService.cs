@@ -23,10 +23,8 @@ namespace DemoWebApi.Services.Users
     public class UserAppService : ApplicationServiceBase, IUserAppService
     {
         private IConfiguration Config { get; }
-        private IUserRepository UserRepository { get; }
-        public UserAppService(IConfiguration configuration, IMapper mapper, IStringLocalizer<ApplicationServiceBase> l, UserRepository userRepository, IHttpContextAccessor httpContext) : base(configuration, mapper, l, userRepository, httpContext)
+        public UserAppService(IConfiguration configuration, IMapper mapper, IStringLocalizer<ApplicationServiceBase> l, IUserRepository userRepository, IHttpContextAccessor httpContext) : base(configuration, mapper, l, userRepository, httpContext)
         {
-            UserRepository = userRepository;
         }
         public async Task<string> AddAsync(CreateUserDto input)
         {
