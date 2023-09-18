@@ -1,8 +1,4 @@
-﻿using DemoWebApi.Entities;
-using System.ComponentModel.DataAnnotations.Schema;
-using System.ComponentModel.DataAnnotations;
-
-namespace DemoWebApi.Dtos.Company
+﻿namespace DemoWebApi.Dtos.Company
 {
     public class CreateCompanyDto
     {
@@ -22,5 +18,6 @@ namespace DemoWebApi.Dtos.Company
         public string CompanyUrl { get; set; }
         public int NationalityId { get; set; }
         public int UserId { get; set; }
+        public List<int> BranchIds { get; set; }
     }
 }

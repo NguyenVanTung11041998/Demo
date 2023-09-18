@@ -19,6 +19,7 @@ namespace DemoWebApi.Services.Companies
     public class CompanyAppService : ApplicationServiceBase, ICompanyAppService
     {
         private ICompanyRepository CompanyRepository { get; }
+
         public CompanyAppService(IConfiguration configuration, IMapper mapper, IStringLocalizer<ApplicationServiceBase> l, IUserRepository userRepository, IHttpContextAccessor httpContext, ICompanyRepository companyRepository) : base(configuration, mapper, l, userRepository, httpContext)
         {
             CompanyRepository = companyRepository;
@@ -45,7 +46,19 @@ namespace DemoWebApi.Services.Companies
                 UserId = 1,
 
             };
-            await CompanyRepository.AddAsync(company, true);
+            company = await CompanyRepository.AddAsync(company, true);
+
+            if (input.BranchIds != null && input.BranchIds.Count > 0)
+            {
+                var entities = input.BranchIds.Select(x => new BranchJobCompany
+                {
+                    BranchJobId = x,
+                    CompanyId = company.Id
+                });
+
+                // insert vào db
+            }
+
         }
         public async Task UpdateCompanyAsync(UpdateCompanyDto input)
         {
@@ -71,6 +84,9 @@ namespace DemoWebApi.Services.Companies
             company.UserId = input.UserId;
 
             await CompanyRepository.UpdateAsync(company, true);
+
+            // lấy ra branch job company theo id công ty
+            // xóa mảng branch job company cũ đi và insert mảng mới
 
         }
         public async Task DeleteCompapnyAsync (int id)

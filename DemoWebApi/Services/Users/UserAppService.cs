@@ -25,6 +25,7 @@ namespace DemoWebApi.Services.Users
         private IConfiguration Config { get; }
         public UserAppService(IConfiguration configuration, IMapper mapper, IStringLocalizer<ApplicationServiceBase> l, IUserRepository userRepository, IHttpContextAccessor httpContext) : base(configuration, mapper, l, userRepository, httpContext)
         {
+            Config = configuration;
         }
         public async Task<string> AddAsync(CreateUserDto input)
         {
@@ -71,7 +72,9 @@ namespace DemoWebApi.Services.Users
         }
         public async Task<string> UpdateUserAsync(UpdateUserDto input)
         {
-            var user = await UserRepository.FirstOrDefaultAsync(x => x.Id == input.Id);
+            var id = GetUserIdOfCurrentUser();
+
+            var user = await UserRepository.FirstOrDefaultAsync(x => x.Id == id);
 
             if (user == null) throw new UserFriendlyException(L["DataNotFound"]);
 
@@ -96,7 +99,7 @@ namespace DemoWebApi.Services.Users
             }
             else if (input.Path.HasValue())
             {
-                input.Path = input.Path;
+                user.Path = input.Path;
             }
 
             var check = await UserRepository.AnyAsync(x => x.Email == input.Email && x.Id != input.Id);
@@ -133,7 +136,9 @@ namespace DemoWebApi.Services.Users
 
         public static int GetUserIdOfCurrentUser(HttpContext httpContext)
         {
-            _ = httpContext.Request.Headers.TryGetValue(HeaderNames.Authorization, out var tokenString);
+            bool isValid = httpContext.Request.Headers.TryGetValue(HeaderNames.Authorization, out var tokenString);
+
+            if (!isValid) return 0;
 
             var jwtEncodedString = tokenString.ToString()[7..];
 
