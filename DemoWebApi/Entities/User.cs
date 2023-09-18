@@ -8,6 +8,6 @@
         public string FullName { get; set; }
         public DateTime? DateOfBirth { get; set; }
         public string Address { get; set; }
-        public string Avatar { get; set; }
+        public string Path { get; set; }
     }
 }

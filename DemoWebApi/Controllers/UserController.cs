@@ -2,6 +2,7 @@
 using DemoWebApi.Services.Users;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Reflection.Metadata.Ecma335;
 
 namespace DemoWebApi.Controllers
 {
@@ -14,13 +15,23 @@ namespace DemoWebApi.Controllers
         {
             UserAppService = userAppService;
         }
-
-        [HttpPut]
-        //[Authorize]
-        [Route("update-avatar")]
-        public async Task<string> UpdateAvatarAsync([FromForm] UserUpdateAvatarRequest input)
+        [HttpPost]
+        [Route("add")]
+        public async Task<string> AddAsync(CreateUserDto input)
         {
-            return await UserAppService.UpdateAvatarAsync(input);
+            return await UserAppService.AddAsync(input);    
+        }
+        [HttpPost]
+        [Route("login")]
+        public async Task<string> LoginAsync(LoginRequest input)
+        {
+            return await UserAppService.LoginAsync(input);
+        }
+        [HttpPost]
+        [Route("update")]
+        public async Task<string> UpdateUserAsync(UpdateUserDto input)
+        {
+            return await UserAppService.UpdateUserAsync(input);
         }
     }
 }

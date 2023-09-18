@@ -1,8 +1,10 @@
 ﻿namespace DemoWebApi.Dtos.Users
 {
-    public class UserDto
+    public class UpdateUserDto
     {
+        public IFormFile File { get; set; }
         public int Id { get; set; }
+
         public string Email { get; set; }
         public string Password { get; set; }
         public string FullName { get; set; }

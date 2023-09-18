@@ -1,8 +1,8 @@
 ﻿namespace DemoWebApi.Dtos.Users
 {
-    public class UserDto
+    public class CreateUserDto
     {
-        public int Id { get; set; }
+        public IFormFile File { get; set; }
         public string Email { get; set; }
         public string Password { get; set; }
         public string FullName { get; set; }
