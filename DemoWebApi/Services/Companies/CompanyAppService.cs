@@ -5,10 +5,12 @@ using DemoWebApi.Entities;
 using DemoWebApi.ExceptionHandling;
 using DemoWebApi.Extensions;
 using DemoWebApi.Helpers;
+using DemoWebApi.Repositories.BranchJobCompanies;
 using DemoWebApi.Repositories.Companies;
 using DemoWebApi.Repositories.Levels;
 using DemoWebApi.Repositories.Nationality;
 using DemoWebApi.Repositories.Users;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Localization;
 using System.Numerics;
@@ -18,14 +20,17 @@ namespace DemoWebApi.Services.Companies
 {
     public class CompanyAppService : ApplicationServiceBase, ICompanyAppService
     {
+        private IBranchJobCompanyRepository BranchJobCompanyRepository { get; }
         private ICompanyRepository CompanyRepository { get; }
 
-        public CompanyAppService(IConfiguration configuration, IMapper mapper, IStringLocalizer<ApplicationServiceBase> l, IUserRepository userRepository, IHttpContextAccessor httpContext, ICompanyRepository companyRepository) : base(configuration, mapper, l, userRepository, httpContext)
+        public CompanyAppService(IConfiguration configuration, IMapper mapper, IStringLocalizer<ApplicationServiceBase> l, IUserRepository userRepository, IHttpContextAccessor httpContext, ICompanyRepository companyRepository, IBranchJobCompanyRepository branchJobCompanyRepository) : base(configuration, mapper, l, userRepository, httpContext)
         {
             CompanyRepository = companyRepository;
+            BranchJobCompanyRepository = branchJobCompanyRepository;
         }
         public async Task AddAsync(CreateCompanyDto input)
         {
+            var id = GetUserIdOfCurrentUser();
             var company = new Company
             {
                 Name = input.Name,
@@ -43,7 +48,7 @@ namespace DemoWebApi.Services.Companies
                 LastUpdateIsHotTime = input.LastUpdateIsHotTime,
                 CompanyUrl = input.CompanyUrl,
                 NationalityId = input.NationalityId,
-                UserId = 1,
+                UserId = id,
 
             };
             company = await CompanyRepository.AddAsync(company, true);
@@ -56,7 +61,7 @@ namespace DemoWebApi.Services.Companies
                     CompanyId = company.Id
                 });
 
-                // insert vào db
+                await BranchJobCompanyRepository.AddRangeAsync(entities, true);
             }
 
         }
@@ -87,6 +92,18 @@ namespace DemoWebApi.Services.Companies
 
             // lấy ra branch job company theo id công ty
             // xóa mảng branch job company cũ đi và insert mảng mới
+            var checkCompany = await BranchJobCompanyRepository.Where(x => x.CompanyId == input.Id).ToListAsync();
+            await BranchJobCompanyRepository.DeleteAsync(checkCompany, true);
+            if (input.BranchIds != null && input.BranchIds.Count > 0)
+            {
+                var entities = input.BranchIds.Select(x => new BranchJobCompany
+                {
+                    BranchJobId = x,
+                    CompanyId = company.Id
+                });
+
+                await BranchJobCompanyRepository.AddRangeAsync(entities, true);
+            }
 
         }
         public async Task DeleteCompapnyAsync (int id)

@@ -19,5 +19,6 @@
         public string CompanyUrl { get; set; }
         public int NationalityId { get; set; }
         public int UserId { get; set; }
+        public List<int> BranchIds { get; set; }
     }
 }

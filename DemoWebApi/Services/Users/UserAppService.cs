@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using DemoWebApi.Consts;
 using DemoWebApi.Dtos.Nationality;
 using DemoWebApi.Dtos.Users;
 using DemoWebApi.Entities;
@@ -121,7 +122,7 @@ namespace DemoWebApi.Services.Users
 
             var claims = new[]
             {
-                new Claim("Id", user.Id.ToString()),
+                new Claim(ClaimType.UserId, user.Id.ToString()),
                 new Claim("email", user.Email)
             };
 
@@ -144,7 +145,7 @@ namespace DemoWebApi.Services.Users
 
             var token = new JwtSecurityToken(jwtEncodedString);
 
-            var claim = token.Claims.FirstOrDefault(x => x.Type == "Id");
+            var claim = token.Claims.FirstOrDefault(x => x.Type == ClaimType.UserId);
 
             string id = claim.Value;
 
