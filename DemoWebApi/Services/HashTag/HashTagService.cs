@@ -33,8 +33,9 @@ namespace DemoWebApi.Services.HashTag
             };
             await HashTagRepository.AddAsync(hashTag, true);
         }
-        public async Task UpdateHashTagAsync(UpdateHashTagDto input)
+        public async Task<HashTagDto> UpdateHashTagAsync(UpdateHashTagDto input)
         {
+            
             var hashTag = await HashTagRepository.FirstOrDefaultAsync(x => x.Id == input.Id);
 
             if (hashTag == null) throw new UserFriendlyException(L["DataNotFound"]);
@@ -44,6 +45,16 @@ namespace DemoWebApi.Services.HashTag
             hashTag.IsHot = input.IsHot;
 
             await HashTagRepository.UpdateAsync(hashTag, true);
+
+            string key = $"HashTag_{hashTag.Id}";
+
+            var dto = Mapper.Map<HashTagDto>(hashTag);
+
+            if (dto == null) return null;
+
+            MemoryCache.Set(key, dto, new MemoryCacheEntryOptions { AbsoluteExpiration = DateTime.Now.AddHours(2) });
+
+            return dto;
         }
 
         public async Task DeleteHashTagAsync(int id)
@@ -72,6 +83,7 @@ namespace DemoWebApi.Services.HashTag
             var cache = MemoryCache.Get<HashTagDto>(key);
 
             if (cache != null) return cache;
+
             var hashTags = await HashTagRepository.FirstOrDefaultAsync(x => x.Id == id);
 
             var dto = Mapper.Map<HashTagDto>(hashTags);

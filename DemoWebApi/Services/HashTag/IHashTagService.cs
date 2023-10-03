@@ -7,7 +7,7 @@ namespace DemoWebApi.Services.HashTag
     {
         Task AddAsync(CreateHashTagDto input);
         Task DeleteHashTagAsync(int id);
-        Task UpdateHashTagAsync(UpdateHashTagDto input);
+        Task<HashTagDto> UpdateHashTagAsync(UpdateHashTagDto input);
         Task<List<HashTagDto>> GetAllHashTagAsync();
         Task<HashTagDto> GetHashTagByIdAsync(int id);
         Task<GridResult<HashTagDto>> GetAllPagingAsync(int page, int pageSize, string keyword);
