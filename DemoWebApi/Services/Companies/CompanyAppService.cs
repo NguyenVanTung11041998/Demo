@@ -49,20 +49,23 @@ namespace DemoWebApi.Services.Companies
                 CompanyUrl = input.CompanyUrl,
                 NationalityId = input.NationalityId,
                 UserId = id,
-
+                BranchJobCompanies = input.BranchIds.Select(x => new BranchJobCompany
+                {
+                    BranchJobId = x
+                }).ToList()
             };
             company = await CompanyRepository.AddAsync(company, true);
 
-            if (input.BranchIds != null && input.BranchIds.Count > 0)
-            {
-                var entities = input.BranchIds.Select(x => new BranchJobCompany
-                {
-                    BranchJobId = x,
-                    CompanyId = company.Id
-                });
+            //if (input.BranchIds != null && input.BranchIds.Count > 0)
+            //{
+            //    var entities = input.BranchIds.Select(x => new BranchJobCompany
+            //    {
+            //        BranchJobId = x,
+            //        CompanyId = company.Id
+            //    });
 
-                await BranchJobCompanyRepository.AddRangeAsync(entities, true);
-            }
+            //    await BranchJobCompanyRepository.AddRangeAsync(entities, true);
+            //}
 
         }
         public async Task UpdateCompanyAsync(UpdateCompanyDto input)

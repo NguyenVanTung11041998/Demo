@@ -7,6 +7,7 @@ using DemoWebApi.Helpers;
 using DemoWebApi.Repositories.Levels;
 using DemoWebApi.Repositories.Users;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Localization;
 
 namespace DemoWebApi.Services.Levels
@@ -15,9 +16,13 @@ namespace DemoWebApi.Services.Levels
     {
         private ILevelRepository LevelRepository { get; }
 
-        public LevelAppService(IConfiguration configuration, IMapper mapper, IStringLocalizer<ApplicationServiceBase> l, IUserRepository userRepository, IHttpContextAccessor httpContext, ILevelRepository levelRepository) : base(configuration, mapper, l, userRepository, httpContext)
+        private IMemoryCache MemoryCache { get; }
+
+        public LevelAppService(IConfiguration configuration, IMapper mapper, IStringLocalizer<ApplicationServiceBase> l, IUserRepository userRepository, IHttpContextAccessor httpContext, ILevelRepository levelRepository, IMemoryCache memoryCache) : base(configuration, mapper, l, userRepository, httpContext)
         {
             LevelRepository = levelRepository;
+
+            MemoryCache = memoryCache;
         }
 
         public async Task AddAsync(CreateLevelDto input)
@@ -45,6 +50,8 @@ namespace DemoWebApi.Services.Levels
             if (level == null) throw new UserFriendlyException(L["DataNotFound"]);
 
             await LevelRepository.DeleteAsync(level, true);
+
+            MemoryCache.Remove($"Level_{id}");
         }
         public async Task<List<LevelDto>> GetAllLevelAsync()
         {
@@ -55,9 +62,21 @@ namespace DemoWebApi.Services.Levels
 
         public async Task<LevelDto> GetLevelByIdAsync(int id)
         {
+            string key = $"Level_{id}";
+
+            var cache = MemoryCache.Get<LevelDto>(key);
+
+            if (cache != null) return cache;
+
             var level = await LevelRepository.FirstOrDefaultAsync(x => x.Id == id);
 
-            return Mapper.Map<LevelDto>(level);
+            var dto = Mapper.Map<LevelDto>(level);
+
+            if (dto == null) return null;
+
+            MemoryCache.Set(key, dto, new MemoryCacheEntryOptions { AbsoluteExpiration = DateTime.Now.AddHours(2) });
+
+            return dto;
         }
 
         public async Task<GridResult<LevelDto>> GetAllPagingAsync(int page, int pageSize, string keyword)
