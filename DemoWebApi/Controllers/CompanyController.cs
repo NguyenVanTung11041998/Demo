@@ -1,6 +1,7 @@
 ﻿using DemoWebApi.Dtos.Company;
 using DemoWebApi.Helpers;
 using DemoWebApi.Services.Companies;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DemoWebApi.Controllers
@@ -33,6 +34,7 @@ namespace DemoWebApi.Controllers
         }
         [HttpGet]
         [Route("all")]
+        [Authorize]
         public async Task<List<CompanyDto>> GetAllCompanyAsync()
         {
             return await companyAppService.GetAllCompanyAsync();

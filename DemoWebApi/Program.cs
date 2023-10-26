@@ -108,8 +108,8 @@ namespace DemoWebApi
                 app.UseRouting();
 
                 // Configure the HTTP request pipeline.
-                app.UseAuthentication();
-                app.UseAuthorization();
+                app.UseAuthentication(); // check xem đã login hay chưa (dành cho các api sử dụng Authorize Attribute)
+                app.UseAuthorization(); // Check xem user đang login có quyền truy cập vào api hay không
 
                 var options = new RequestLocalizationOptions
                 {
@@ -117,6 +117,30 @@ namespace DemoWebApi
                 };
 
                 app.UseStaticFiles();
+
+                app.Use(async (context, next) =>
+                {
+                    string url = context.Request.Path;
+
+                    // nếu api có url chứa company thì sẽ trả ra status code 244 và message bên dưới
+                    if (url.Contains("company"))
+                    {
+                        context.Response.StatusCode = 244;
+
+                        await context.Response.WriteAsync("Bạn không thể truy cập vào api company");
+
+                        return;
+                    }
+
+                    await next();
+                });
+
+                app.Use(async (context, next) =>
+                {
+                    string url = context.Request.Scheme;
+
+                    await next();
+                });
 
                 app.UseMiddleware<LocalizationMiddleware>();
 

@@ -1,7 +1,5 @@
 ﻿using AutoMapper;
 using DemoWebApi.Dtos.HashTag;
-using DemoWebApi.Dtos.Levels;
-using DemoWebApi.Entities;
 using DemoWebApi.ExceptionHandling;
 using DemoWebApi.Extensions;
 using DemoWebApi.Helpers;

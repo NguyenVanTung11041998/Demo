@@ -23,9 +23,9 @@ namespace DemoWebApi.Controllers
         }
         [HttpPut]
         [Route("update")]
-        public async Task UpdateHashTagAsync(UpdateHashTagDto input)
+        public async Task<HashTagDto> UpdateHashTagAsync(UpdateHashTagDto input)
         {
-             await HashTagService.UpdateHashTagAsync(input);
+             return await HashTagService.UpdateHashTagAsync(input);
         }
         
         [HttpDelete]
