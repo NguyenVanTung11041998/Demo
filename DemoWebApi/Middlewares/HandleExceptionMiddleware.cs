@@ -33,9 +33,7 @@ namespace DemoWebApi.Middlewares
 
                 string text = await new StreamReader(context.Response.Body).ReadToEndAsync();
 
-                bool isValidJson = text.IsValidJson();
-
-                var obj = isValidJson ? JsonConvert.DeserializeObject(text) : text;
+                var obj = JsonConvert.DeserializeObject(text);
 
                 bool isSuccess = context.Response.StatusCode >= (int)HttpStatusCode.OK && context.Response.StatusCode < (int)HttpStatusCode.MultipleChoices;
 
@@ -48,13 +46,16 @@ namespace DemoWebApi.Middlewares
                     Data = obj
                 }.ToString();
 
-                context.Response.Clear();
+                if (!context.Response.HasStarted)
+                {
+                    context.Response.Clear();
 
-                context.Response.ContentType = MimeTypeNames.ApplicationJson;
+                    context.Response.ContentType = MimeTypeNames.ApplicationJson;
 
-                context.Response.StatusCode = statusCode;
+                    context.Response.StatusCode = statusCode;
 
-                await context.Response.WriteAsync(res);
+                    await context.Response.WriteAsync(res);
+                }
             }
             catch (UserFriendlyException ex)
             {
